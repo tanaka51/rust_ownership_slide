@@ -5,15 +5,39 @@ class: center middle
 
 ---
 
+このスライドは Rust of Us での発表に使われたものに加筆修正したものです。
+[Ownership](https://doc.rust-lang.org/nightly/book/ownership.html) を元に作成しました。
+
+---
+
 # ３部作
 
-.big-big-list[
+Rust はメモリーセーフであるために、避けては通れない、ユニークで独立した3つの機能をもっている:
+
 - Ownership
 - Borrowing
 - lifetimes
-]
+
+これらをしっかり理解することが大切である。
 
 ---
+
+# まえがき（Meta 意訳）
+
+> Rust は安全性とスピードを重視しています。たくさんの 'zero-cost abstranctions'(Rust においては、
+実際には問題にならない程小さいコストでの抽象化を意味する) を通してこれらのゴールを達成します。
+ownership システムは zero-cost abstractions のうちの主軸となる例の一つです。"done at compile time"
+といい、これらの機能を使うのに、実行時のコストを払う必要は全くありません。
+
+> しかしながら、このシステムは確実にかかるコストがあります。学習曲線です。新しく Rust を始める人は、
+私達でいうところの "borrow checker との戦い" を経験しています。正しいと思って書いたコードを
+Rust のコンパイラがコンパイルできない、という事です。これは、だいたいは、プログラマーが考えている
+ownership のメンタルモデルと、Rust に実際に実装されているの本当のルールと異なっているためです。
+あなたも最初は同じようなことが経験するでしょう。でも良いニュースがあります: たくさんの Rust 熟練者
+は、一度 ownership のルールを理解してしまえば、borrow checker と戦うことは本当に少なくなると言っています。
+
+---
+
 
 class: center middle
 # Ownership
