@@ -5,7 +5,22 @@ class: center middle
 
 ---
 
-name: summary
+# ３部作
+
+.big-big-list[
+- Ownership
+- Borrowing
+- lifetimes
+]
+
+---
+
+class: center middle
+# Ownership
+
+---
+
+name: summary-ownership
 
 # Ownership 3行で
 
@@ -104,7 +119,7 @@ println!("v is: {}", v); // エラーは発生しない
 # しかし、そのせいでコードがグチャッとしてしまう
 
 ```rust
-(v1: Vec<i32>, v2: Vec<i32>) -> (Vec<i32>, Vec<i32>, i32) {
+fn foo(v1: Vec<i32>, v2: Vec<i32>) -> (Vec<i32>, Vec<i32>, i32) {
     // v1 と v2 に何かする
 
     // オーナーシップを戻しつつ、関数の戻り値も返す
@@ -121,6 +136,165 @@ let (v1, v2, answer) = foo(v1, v2);
 
 ---
 
-template: summary
+template: summary-ownershi
 
 煩雑になる部分は、borrow という仕組みで解決される。
+
+---
+
+class: center middle
+# Borrowing
+
+---
+
+name: summary-borrowing
+
+# Borrowing を三行で
+
+.big-list[
+- オーナーシップを移動せずに、貸し出す機能
+- 貸し出し元(Owner)より小さいスコープでのみ使える
+- 参照のみの貸し出しと、変更可能な貸し出しがある
+]
+
+---
+
+# 具体例1
+
+参照のみの貸し出し:
+
+```rust
+fn foo(v1: &Vec<i32>, v2: &Vec<i32>) -> i32 {
+    // v1 と v2 に何かする
+
+    // 答えを返す
+    42
+}
+
+let v1 = vec![1, 2, 3];
+let v2 = vec![1, 2, 3];
+
+let answer = foo(&v1, &v2);
+
+// v1 と v2 が使える!!
+```
+
+引数として `&Vec<i32>` のように & を追加するだけ
+
+---
+
+# 具体例2
+
+変更可能な貸し出し:
+
+```rust
+let mut x = 5;
+{
+    let y = &mut x;
+    *y += 1;
+}
+println!("{}", x);
+```
+
+`&mut` をつけると変更可能な貸し出しができる。
+ここでスコープをつくっているのは、オーナーよりも狭いスコープでしか Borrowing できないため。
+
+---
+
+# Borrowing とスコープ
+
+```rust
+let mut x = 5;
+
+let y = &mut x;    // -+ &mut borrow of x starts here
+                   //  |
+*y += 1;           //  |
+                   //  |
+println!("{}", x); // -+ - try to borrow x here
+                   // -+ &mut borrow of x ends here
+```
+
+```rust
+let mut x = 5;
+
+{
+    let y = &mut x; // -+ &mut borrow starts here
+    *y += 1;        //  |
+}                   // -+ ... and ends here
+
+println!("{}", x);  // <- try to borrow x here
+```
+
+---
+
+# なぜこんなルールがあるのか？
+
+## => データレースを防ぐため
+
+どんな問題を防げるのか
+
+---
+
+# イテレータでの不正を防ぐ
+
+動くコード:
+
+```rust
+let mut v = vec![1, 2, 3];
+
+for i in &v {
+    println!("{}", i);
+}
+```
+
+エラーになるコード:
+
+```rust
+let mut v = vec![1, 2, 3];
+
+for i in &v {
+    println!("{}", i);
+    v.push(34);
+}
+```
+
+=> これができないのは、v はすでに for に貸し出されてるから
+
+---
+
+# 開放後へのアクセスを防ぐ1
+
+エラーになる:
+
+```rust
+let y: &i32;
+{
+    let x = 5;
+    y = &x;
+}
+
+println!("{}", y);
+```
+=> y は x が存在している間でしか存在できない
+
+---
+
+# 開放後へのアクセスを防ぐ2
+
+エラーになる:
+
+```rust
+let y: &i32;
+let x = 5;
+y = &x;
+
+println!("{}", y);
+```
+
+=> y が x より長く存在していることになってしまう。
+
+---
+
+template: summary-ownership
+
+@katsuyoshi の発表に続きます
