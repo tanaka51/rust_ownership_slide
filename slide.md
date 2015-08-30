@@ -136,7 +136,7 @@ let (v1, v2, answer) = foo(v1, v2);
 
 ---
 
-template: summary-ownershi
+template: summary-ownership
 
 煩雑になる部分は、borrow という仕組みで解決される。
 
@@ -275,7 +275,7 @@ let y: &i32;
 
 println!("{}", y);
 ```
-=> y は x が存在している間でしか存在できない
+=> y は x が存在している間でしか存在できないのでエラー。
 
 ---
 
@@ -291,10 +291,10 @@ y = &x;
 println!("{}", y);
 ```
 
-=> y が x より長く存在していることになってしまう。
+=> y が x より長く存在していることになってしまうのでエラー。
 
 ---
 
-template: summary-ownership
+template: summary-borrowing
 
 @katsuyoshi の発表に続きます
